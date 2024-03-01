@@ -1,0 +1,41 @@
+name: Binary Release
+
+on:
+  push:
+    tags:
+      - "*"
+  workflow_dispatch:
+
+permissions: write-all
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install pkg
+        run: npm install -g pkg
+
+      - name: Install application dependencies
+        run: npm install
+
+      - name: Build binary
+        run: pkg -t node18-linux-x64 hls-proxy/bin/hlsd.js
+
+      - name: Compress binary
+        run: |
+          tar -czvf linux-x64.tar.gz hlsd
+
+      - name: Upload assets
+        uses: softprops/action-gh-release@v1
+        with:
+          files: linux-x64.tar.gz
+          prerelease: false
