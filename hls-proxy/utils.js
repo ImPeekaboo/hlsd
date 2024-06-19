@@ -120,8 +120,32 @@ const debug = function() {
   }
 }
 
-const get_request_options = function(params, url, is_m3u8, referer_url) {
-  const {req_headers, req_options, hooks, http_proxy} = params
+const normalize_req_headers = function(req_headers, blacklist) {
+  const normalized = {}
+
+  if (blacklist && !Array.isArray(blacklist))
+    blacklist = null
+  if (blacklist)
+    blacklist = blacklist.filter(val => val && (typeof val === 'string')).map(val => val.toLowerCase())
+  if (blacklist && !blacklist.length)
+    blacklist = null
+
+  for (let name in req_headers) {
+    const lc_name = name.toLowerCase()
+
+    if (!blacklist || (blacklist.indexOf(lc_name) === -1))
+      normalized[lc_name] = req_headers[name]
+  }
+
+  return normalized
+}
+
+const get_request_options = function(params, url, is_m3u8, referer_url, inbound_req_headers) {
+  const {copy_req_headers, req_headers, req_options, hooks, http_proxy} = params
+
+  const copied_req_headers = (copy_req_headers && inbound_req_headers && (inbound_req_headers instanceof Object))
+    ? normalize_req_headers(inbound_req_headers, ['host'])
+    : null
 
   const additional_req_options = (hooks && (hooks instanceof Object) && hooks.add_request_options && (typeof hooks.add_request_options === 'function'))
     ? hooks.add_request_options(url, is_m3u8)
@@ -131,7 +155,7 @@ const get_request_options = function(params, url, is_m3u8, referer_url) {
     ? hooks.add_request_headers(url, is_m3u8)
     : null
 
-  if (!req_options && !http_proxy && !additional_req_options && !req_headers && !additional_req_headers && !referer_url) return url
+  if (!req_options && !http_proxy && !additional_req_options && !copied_req_headers && !req_headers && !additional_req_headers && !referer_url) return url
 
   const request_options = Object.assign(
     {},
@@ -142,6 +166,7 @@ const get_request_options = function(params, url, is_m3u8, referer_url) {
 
   request_options.headers = Object.assign(
     {},
+    (copied_req_headers      || {}),
     ((           req_options &&            req_options.headers) ?            req_options.headers : {}),
     ((additional_req_options && additional_req_options.headers) ? additional_req_options.headers : {}),
     (req_headers             || {}),
@@ -186,6 +211,7 @@ module.exports = {
   get_content_type,
   add_CORS_headers,
   debug,
+  normalize_req_headers,
   get_request_options,
   should_prefetch_url
 }

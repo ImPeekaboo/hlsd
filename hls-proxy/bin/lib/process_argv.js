@@ -2,6 +2,8 @@ const process_argv = require('@warren-bank/node-process-argv')
 
 const {HttpProxyAgent, HttpsProxyAgent} = require('hpagent')
 
+const {normalize_req_headers} = require('../../utils')
+
 const argv_flags = {
   "--help":                                 {bool: true},
   "--version":                              {bool: true},
@@ -10,6 +12,7 @@ const argv_flags = {
   "--host":                                 {},
   "--port":                                 {num:  "int"},
 
+  "--copy-req-headers":                     {bool: true},
   "--req-headers":                          {file: "json"},
   "--origin":                               {},
   "--referer":                              {},
@@ -74,7 +77,7 @@ if (argv_vals["--version"]) {
 }
 
 if (argv_vals["--origin"] || argv_vals["--referer"] || argv_vals["--useragent"] || (Array.isArray(argv_vals["--header"]) && argv_vals["--header"].length)) {
-  argv_vals["--req-headers"] = argv_vals["--req-headers"] || {}
+  argv_vals["--req-headers"] = normalize_req_headers( argv_vals["--req-headers"] || {} )
 
   if (argv_vals["--origin"]) {
     argv_vals["--req-headers"]["origin"] = argv_vals["--origin"]
@@ -151,13 +154,8 @@ if (argv_vals["--req-secure-honor-server-cipher-order"] || argv_vals["--req-secu
   }
 }
 
-if (argv_vals["--req-options"] && argv_vals["--req-options"]["headers"]) {
-  const lc_headers = {}
-  for (let key in argv_vals["--req-options"]["headers"]) {
-    lc_headers[ key.toLowerCase() ] = argv_vals["--req-options"]["headers"][key]
-  }
-  argv_vals["--req-options"]["headers"] = lc_headers
-}
+if (argv_vals["--req-options"] && argv_vals["--req-options"]["headers"])
+  argv_vals["--req-options"]["headers"] = normalize_req_headers( argv_vals["--req-options"]["headers"] )
 
 if (typeof argv_vals["--max-segments"] !== 'number')
   argv_vals["--max-segments"] = 20

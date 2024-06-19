@@ -6,6 +6,7 @@ const port = 8080
 const middleware = require('../../../hls-proxy/proxy')({
   is_secure:                false,
   host:                     null,
+  copy_req_headers:         false,
   req_headers:              null,
   req_options:              null,
   hooks:                    null,

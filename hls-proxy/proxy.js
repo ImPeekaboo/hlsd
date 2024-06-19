@@ -79,7 +79,7 @@ const get_middleware = function(params) {
       }
     }
 
-    const options = get_request_options(url, is_m3u8, referer_url)
+    const options = get_request_options(url, is_m3u8, referer_url, req.headers)
     debug(1, 'proxying:', url)
     debug(3, 'm3u8:', (is_m3u8 ? 'true' : 'false'))
 
@@ -107,7 +107,7 @@ const get_middleware = function(params) {
           : url
 
         res.writeHead(200, { "content-type": "application/x-mpegURL" })
-        res.end( modify_m3u8_content(response.toString().trim(), m3u8_url, referer_url, redirected_base_url, qs_password) )
+        res.end( modify_m3u8_content(response.toString().trim(), m3u8_url, referer_url, req.headers, redirected_base_url, qs_password) )
       }
     })
     .catch((e) => {

@@ -7,4 +7,4 @@ file_extension='.txt'
 
 hls_proxy_url="${proxy_url}/"$(echo -n "${request_url}|${referer_url}" | base64 --wrap=0)"$file_extension"
 
-curl --silent "$hls_proxy_url"
+curl -H 'x-foo: Foo' -H 'x-bar: Bar' -H 'x-baz: Baz' --silent "$hls_proxy_url"

@@ -113,6 +113,7 @@ options:
 --tls
 --host <host>
 --port <number>
+--copy-req-headers
 --req-headers <filepath>
 --origin <header>
 --referer <header>
@@ -167,6 +168,7 @@ options:
   * when this option is not specified:
     * HTTP proxy binds to: `80`
     * HTTPS proxy binds to: `443`
+* _--copy-req-headers_ is a flag to enable the duplication of all HTTP request headers sent to the proxy &rarr; to the request made by the proxy to the video server
 * _--req-headers_ is the filepath to a JSON data _Object_ containing key:value pairs
   * each _key_ is the name of an HTTP header to send in every outbound request
 * _--origin_ is the value of the corresponding HTTP request header

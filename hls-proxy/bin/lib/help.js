@@ -8,6 +8,7 @@ options:
 --tls
 --host <host>
 --port <number>
+--copy-req-headers
 --req-headers <filepath>
 --origin <header>
 --referer <header>

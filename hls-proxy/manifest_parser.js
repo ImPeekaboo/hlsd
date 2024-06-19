@@ -382,7 +382,7 @@ const modify_m3u8_line = function(embedded_url, m3u8_lines) {
   }
 }
 
-const modify_m3u8_content = function(params, segment_cache, m3u8_content, m3u8_url, referer_url, redirected_base_url, qs_password) {
+const modify_m3u8_content = function(params, segment_cache, m3u8_content, m3u8_url, referer_url, inbound_req_headers, redirected_base_url, qs_password) {
   const {hooks, cache_segments, max_segments, debug_level, manifest_extension, segment_extension} = params
 
   const {has_cache, get_time_since_last_access, is_expired, prefetch_segment} = segment_cache
@@ -424,13 +424,13 @@ const modify_m3u8_content = function(params, segment_cache, m3u8_content, m3u8_u
           const matching_url = urls[0]
           urls[0] = undefined
 
-          promise = prefetch_segment(m3u8_url, matching_url, referer_url, dont_touch_access)
+          promise = prefetch_segment(m3u8_url, matching_url, referer_url, inbound_req_headers, dont_touch_access)
         }
 
         promise.then(() => {
           urls.forEach((matching_url, index) => {
             if (matching_url) {
-              prefetch_segment(m3u8_url, matching_url, referer_url, dont_touch_access)
+              prefetch_segment(m3u8_url, matching_url, referer_url, inbound_req_headers, dont_touch_access)
 
               urls[index] = undefined
             }
